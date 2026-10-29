@@ -15,6 +15,8 @@ load_dotenv()
 
 RTSP_URL = os.getenv("RTSP_URL", "")
 CONFIDENCE = float(os.getenv("CONFIDENCE", "0.55"))
+WEB_HOST = os.getenv("WEB_HOST", "127.0.0.1")
+WEB_PORT = int(os.getenv("WEB_PORT", "5000"))
 app = Flask(__name__)
 
 state = {
@@ -141,4 +143,4 @@ def status():
 
 if __name__ == "__main__":
     threading.Thread(target=camera_worker, daemon=True).start()
-    app.run(host="127.0.0.1", port=5000, threaded=True)
+    app.run(host=WEB_HOST, port=WEB_PORT, threaded=True)

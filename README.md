@@ -44,3 +44,13 @@ py web_app.py
 
 Mở trình duyệt trên máy chạy server tại `http://127.0.0.1:5000`.
 Trang sẽ hiển thị video có khung nhận diện người và trạng thái kết nối.
+
+Nếu truy cập từ máy khác trong cùng LAN hoặc qua Tailscale, đặt trong `.env`:
+
+```env
+WEB_HOST=0.0.0.0
+WEB_PORT=5000
+```
+
+Sau đó mở `http://IP_MAY_CHAY_SERVER:5000`. Chỉ mở cổng này trong LAN/VPN,
+không mở trực tiếp ra Internet.
