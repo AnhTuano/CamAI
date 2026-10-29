@@ -21,6 +21,8 @@ load_dotenv()
 RTSP_URL = os.getenv("RTSP_URL", "")
 CONFIDENCE = float(os.getenv("CONFIDENCE", "0.55"))
 COOLDOWN_SECONDS = int(os.getenv("COOLDOWN_SECONDS", "30"))
+INFERENCE_EVERY = max(1, int(os.getenv("INFERENCE_EVERY", "4")))
+DISPLAY_FPS = max(1, int(os.getenv("DISPLAY_FPS", "15")))
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")
 WEBHOOK_TOKEN = os.getenv("WEBHOOK_TOKEN", "")
 SNAPSHOT_DIR = Path("snapshots")
@@ -46,6 +48,8 @@ class CameraPanel:
         self.people = 0
         self.last_notification = 0.0
         self.stop_event = threading.Event()
+        self.frame_number = 0
+        self.last_boxes = []
 
         container = ttk.Frame(parent)
         container.grid_propagate(False)
@@ -79,6 +83,7 @@ class CameraPanel:
                     if camera is not None:
                         camera.release()
                     camera = cv2.VideoCapture(url)
+                    camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
                     if not camera.isOpened():
                         self.status = "Không kết nối được; thử lại sau 3 giây"
                         time.sleep(3)
@@ -92,12 +97,18 @@ class CameraPanel:
                     time.sleep(2)
                     continue
 
-                with MODEL_LOCK:
-                    result = model.predict(
-                        frame, conf=CONFIDENCE, classes=[0], verbose=False
-                    )[0]
-                self.people = len(result.boxes)
-                annotated = result.plot()
+                self.frame_number += 1
+                if self.frame_number % INFERENCE_EVERY == 0:
+                    with MODEL_LOCK:
+                        result = model.predict(
+                            frame, conf=CONFIDENCE, classes=[0], verbose=False
+                        )[0]
+                    self.people = len(result.boxes)
+                    self.last_boxes = result.boxes
+                annotated = frame.copy()
+                for box in self.last_boxes:
+                    x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
+                    cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 220, 0), 2)
                 now = time.time()
                 if self.people and now - self.last_notification >= COOLDOWN_SECONDS:
                     snapshot = SNAPSHOT_DIR / (
@@ -142,7 +153,9 @@ class CameraPanel:
             frame = self.latest_frame
         if frame is not None:
             image = Image.fromarray(frame)
-            image.thumbnail((600, 340))
+            width = max(320, self.video.winfo_width() - 8)
+            height = max(180, self.video.winfo_height() - 8)
+            image = image.resize((width, height), Image.Resampling.LANCZOS)
             photo = ImageTk.PhotoImage(image)
             self.video.configure(image=photo)
             self.video.image = photo
@@ -199,7 +212,7 @@ class CameraApp:
         for panel in self.panels:
             panel.refresh()
         if any(not panel.stop_event.is_set() for panel in self.panels):
-            self.root.after(100, self.refresh_display)
+            self.root.after(max(1, int(1000 / DISPLAY_FPS)), self.refresh_display)
 
     def close(self) -> None:
         for panel in self.panels:

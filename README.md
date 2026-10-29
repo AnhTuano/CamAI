@@ -20,7 +20,9 @@ URL thường dùng:
 rtsp://USER:PASSWORD@CAMERA_IP:554/cam/realmonitor?channel=1&subtype=0
 ```
 
-`subtype=0` là luồng chính; dùng `subtype=1` nếu máy yếu. Model `yolo11n.pt`
+`subtype=0` là luồng chính, rõ hơn; dùng `subtype=1` nếu máy yếu. Với 4 kênh,
+app chỉ chạy AI mỗi 4 khung hình và hiển thị video ở tối đa 15 FPS để giảm lag.
+Có thể chỉnh `INFERENCE_EVERY` và `DISPLAY_FPS` trong `.env`. Model `yolo11n.pt`
 sẽ được tải tự động ở lần chạy đầu.
 
 ## Gửi cảnh báo Zalo
