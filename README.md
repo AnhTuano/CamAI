@@ -33,24 +33,14 @@ và tùy chọn `WEBHOOK_TOKEN`. Webhook nhận JSON gồm `event`, `count`,
 Không mở RTSP trực tiếp ra Internet; chỉ cho máy AI truy cập camera trong mạng
 LAN hoặc dùng VPN.
 
-## Mở web để test
+## Chạy ứng dụng cửa sổ
 
-Sau khi đã điền đúng `RTSP_URL` trong `.env`:
+Sau khi đã điền đúng `RTSP_URL` trong `.env`, cài thư viện và chạy:
 
 ```powershell
 py -m pip install -r requirements.txt
-py web_app.py
+py desktop_app.py
 ```
 
-Mở trình duyệt trên máy chạy server tại `http://127.0.0.1:5000`.
-Trang sẽ hiển thị video có khung nhận diện người và trạng thái kết nối.
-
-Nếu truy cập từ máy khác trong cùng LAN hoặc qua Tailscale, đặt trong `.env`:
-
-```env
-WEB_HOST=0.0.0.0
-WEB_PORT=5000
-```
-
-Sau đó mở `http://IP_MAY_CHAY_SERVER:5000`. Chỉ mở cổng này trong LAN/VPN,
-không mở trực tiếp ra Internet.
+Ứng dụng sẽ mở cửa sổ xem camera, vẽ khung người, lưu snapshot và gửi webhook
+khi phát hiện người. Không cần Flask hoặc trình duyệt.
