@@ -42,5 +42,7 @@ py -m pip install -r requirements.txt
 py desktop_app.py
 ```
 
-Ứng dụng sẽ mở cửa sổ xem camera, vẽ khung người, lưu snapshot và gửi webhook
-khi phát hiện người. Không cần Flask hoặc trình duyệt.
+Ứng dụng sẽ mở cửa sổ 2x2 xem cả 4 kênh (hiển thị kênh 0-3), vẽ khung người,
+lưu snapshot và gửi webhook khi phát hiện người. URL trong `.env` chỉ cần chứa
+`channel=1`; app tự dùng RTSP channel 1-4 tương ứng với kênh hiển thị 0-3.
+Không cần Flask hoặc trình duyệt.
