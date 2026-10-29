@@ -19,14 +19,15 @@ from ultralytics import YOLO
 load_dotenv()
 
 RTSP_URL = os.getenv("RTSP_URL", "")
-CONFIDENCE = float(os.getenv("CONFIDENCE", "0.55"))
+CONFIDENCE = float(os.getenv("CONFIDENCE", "0.35"))
 COOLDOWN_SECONDS = int(os.getenv("COOLDOWN_SECONDS", "30"))
-INFERENCE_EVERY = max(1, int(os.getenv("INFERENCE_EVERY", "4")))
+INFERENCE_EVERY = max(1, int(os.getenv("INFERENCE_EVERY", "2")))
 DISPLAY_FPS = max(1, int(os.getenv("DISPLAY_FPS", "15")))
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")
 WEBHOOK_TOKEN = os.getenv("WEBHOOK_TOKEN", "")
 SNAPSHOT_DIR = Path("snapshots")
 MODEL_LOCK = threading.Lock()
+DETECTION_CLASSES = [0, 1, 2, 3, 5, 7]
 
 
 def channel_url(base_url: str, rtsp_channel: int) -> str:
@@ -101,7 +102,10 @@ class CameraPanel:
                 if self.frame_number % INFERENCE_EVERY == 0:
                     with MODEL_LOCK:
                         result = model.predict(
-                            frame, conf=CONFIDENCE, classes=[0], verbose=False
+                            frame,
+                            conf=CONFIDENCE,
+                            classes=DETECTION_CLASSES,
+                            verbose=False,
                         )[0]
                     self.people = len(result.boxes)
                     self.last_boxes = result.boxes
@@ -122,7 +126,7 @@ class CameraPanel:
 
                 with self.frame_lock:
                     self.latest_frame = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
-                self.status = f"Đã kết nối | Người: {self.people}"
+                self.status = f"Đã kết nối | Đối tượng: {self.people}"
         finally:
             if camera is not None:
                 camera.release()

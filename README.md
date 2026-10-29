@@ -20,8 +20,9 @@ URL thường dùng:
 rtsp://USER:PASSWORD@CAMERA_IP:554/cam/realmonitor?channel=1&subtype=0
 ```
 
-`subtype=0` là luồng chính, rõ hơn; dùng `subtype=1` nếu máy yếu. Với 4 kênh,
-app chỉ chạy AI mỗi 4 khung hình và hiển thị video ở tối đa 15 FPS để giảm lag.
+`subtype=0` là luồng chính, rõ hơn; dùng `subtype=1` nếu máy yếu. App phát hiện
+người, xe đạp, ô tô, xe máy, xe buýt và xe tải. Với 4 kênh, app chạy AI mỗi 2
+khung hình và hiển thị video ở tối đa 15 FPS để giảm lag.
 Có thể chỉnh `INFERENCE_EVERY` và `DISPLAY_FPS` trong `.env`. Model `yolo11n.pt`
 sẽ được tải tự động ở lần chạy đầu.
 
